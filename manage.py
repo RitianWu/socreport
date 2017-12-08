@@ -4,6 +4,7 @@ import unittest
 
 from flask_script import Manager
 from project import create_app, db
+from project.api.models import Report
 
 app = create_app()
 manager = Manager(app)
@@ -24,6 +25,14 @@ def recreate_db():
     """Recreates a database."""
     db.drop_all()
     db.create_all()
+    db.session.commit()
+
+
+@manager.command
+def seed_db():
+    """Seeds the database."""
+    db.session.add(Report(name='测试1', url='http://wiosky.com/test1.jpg'))
+    db.session.add(Report(name='测试2', url='http://wiosky.com/test2.jpg'))
     db.session.commit()
 
 
