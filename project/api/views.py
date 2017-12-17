@@ -13,7 +13,7 @@ report_blueprint = Blueprint('report', __name__)
 def ping_pong():
     return jsonify({
         'status': 'success',
-        'message': 'pong!'
+        'message': 'Pong'
     })
 
 

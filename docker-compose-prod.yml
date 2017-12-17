@@ -16,19 +16,18 @@ services:
   report-service:
     container_name: report-service
     build: ./
-    volumes:
-      - '.:/usr/src/app'
-    ports:
-      - 5001:5000 # expose ports - HOST:CONTAINER
+    expose:
+      - 5000
     environment:
-      - APP_SETTINGS=project.config.DevelopmentConfig
-      - DATABASE_URL=postgres://postgres:postgres@report-db:5432/report_dev
+      - APP_SETTINGS=project.config.ProductionConfig
+      - DATABASE_URL=postgres://postgres:postgres@report-db:5432/report_prod
       - DATABASE_TEST_URL=postgres://postgres:postgres@report-db:5432/report_test
     depends_on:
       report-db:
         condition: service_healthy
     links:
       - report-db
+    command: gunicorn -b 0.0.0.0:5000 manage:app
 
   nginx:
     container_name: nginx

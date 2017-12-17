@@ -23,7 +23,7 @@ class TestReportService(BaseTestCase):
         response = self.client.get('/ping')
         data = json.loads(response.data.decode())
         self.assertEqual(response.status_code, 200)
-        self.assertIn('pong!', data['message'])
+        self.assertIn('Pong', data['message'])
         self.assertIn('success', data['status'])
 
     def test_add_report(self):
