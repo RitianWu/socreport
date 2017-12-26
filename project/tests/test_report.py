@@ -26,6 +26,39 @@ class TestReportService(BaseTestCase):
         self.assertIn('Pong', data['message'])
         self.assertIn('success', data['status'])
 
+    def test_main_no_report(self):
+        """Ensure the main route behaves correctly when no reports have been
+    added to the database."""
+        response = self.client.get('/')
+        self.assertEqual(response.status_code, 200)
+        self.assertIn(b'<h1>All Reports</h1>', response.data)
+        self.assertIn(b'<p>No reports!</p>', response.data)
+
+    def test_main_with_report(self):
+        """Ensure the main route behaves correctly when reports have been
+    added to the database."""
+        add_report('Report-test-1', 'http://wiosky.com/test1.jpg')
+        add_report('Report-test-2', 'http://wiosky.com/test2.jpg')
+        response = self.client.get('/')
+        self.assertEqual(response.status_code, 200)
+        self.assertIn(b'<h1>All Reports</h1>', response.data)
+        self.assertNotIn(b'<p>No reports!</p>', response.data)
+        self.assertIn(b'<strong>Report-test-1</strong>', response.data)
+        self.assertIn(b'<strong>Report-test-2</strong>', response.data)
+
+    def test_main_add_report(self):
+        """Ensure a new report can be added to the database."""
+        with self.client:
+            response = self.client.post(
+                '/',
+                data=dict(name='test', url='www.example.com'),
+                follow_redirects=True
+            )
+            self.assertEqual(response.status_code, 200)
+            self.assertIn(b'<h1>All Reports</h1>', response.data)
+            self.assertNotIn(b'<p>No reports!</p>', response.data)
+            self.assertIn(b'<strong>test</strong>', response.data)
+
     def test_add_report(self):
         """Ensure a new report can be added to the database."""
         with self.client:

@@ -1,12 +1,12 @@
 # project/api/views.py
 
 
-from flask import Blueprint, jsonify, request
+from flask import Blueprint, jsonify, request, render_template
 from project import db
 from project.api.models import Report
 from sqlalchemy import exc
 
-report_blueprint = Blueprint('report', __name__)
+report_blueprint = Blueprint('report', __name__, template_folder='./templates')
 
 
 @report_blueprint.route('/ping', methods=['GET'])
@@ -15,6 +15,17 @@ def ping_pong():
         'status': 'success',
         'message': 'Pong'
     })
+
+
+@report_blueprint.route('/', methods=['GET', 'POST'])
+def index():
+    if request.method == 'POST':
+        name = request.form['name']
+        url = request.form['url']
+        db.session.add(Report(name=name, url=url))
+        db.session.commit()
+    reports = Report.query.order_by(Report.create_time.desc()).all()
+    return render_template('index.html', reports=reports)
 
 
 @report_blueprint.route('/reports', methods=['POST'])
